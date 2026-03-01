@@ -1,11 +1,19 @@
 const express = require('express');
 const { createClient } = require('@supabase/supabase-js');
 const cors = require('cors');
+require('dotenv').config(); // ← ДОБАВИЛИ ЭТУ СТРОКУ!
+
 const app = express();
 
-// Эти ключи будут на сервере, в безопасности!
-const SUPABASE_URL = "https://njqhoiedauyyivbhvyla.supabase.co";
-const SUPABASE_SERVICE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im5qcWhvaWVkYXV5eWl2Ymh2eWxhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDEzNzY5NjQsImV4cCI6MjA1Njk1Mjk2NH0.nWbuowFz2rI4zMeci0a-JGSyGCC3xFmh8oVRTz14eZ8"; // НЕ anon ключ!
+// Эти переменные теперь берутся из окружения (Render или .env файл)
+const SUPABASE_URL = process.env.SUPABASE_URL || "https://njqhoiedauyyivbhvyla.supabase.co";
+const SUPABASE_SERVICE_KEY = process.env.SUPABASE_SERVICE_KEY; // Ключ только из переменных окружения!
+
+// Проверка, что ключ загружен (для отладки)
+if (!SUPABASE_SERVICE_KEY) {
+  console.error('❌ SUPABASE_SERVICE_KEY is not set! Check your environment variables.');
+  process.exit(1); // Остановит сервер, если ключа нет
+}
 
 const supabase = createClient(SUPABASE_URL, SUPABASE_SERVICE_KEY);
 
@@ -141,4 +149,4 @@ app.post('/api/profile', async (req, res) => {
 });
 
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+app.listen(PORT, () => console.log(`✅ Server running on port ${PORT}`));
