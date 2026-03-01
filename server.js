@@ -1,6 +1,24 @@
 const express = require('express');
 const { createClient } = require('@supabase/supabase-js');
 const cors = require('cors');
+const app = express();
+
+// ✅ РАЗРЕШАЕМ ЗАПРОСЫ С ВАШЕГО САЙТА
+app.use(cors({
+  origin: 'https://shimmering-panda-4e619f.netlify.app', // ТОЛЬКО ваш сайт
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  credentials: true
+}));
+
+// ИЛИ если хотите разрешить всем (для теста):
+// app.use(cors());
+
+app.use(express.json());
+
+// ... остальной код
+const { createClient } = require('@supabase/supabase-js');
+const cors = require('cors');
 require('dotenv').config(); // ← ДОБАВИЛИ ЭТУ СТРОКУ!
 
 const app = express();
