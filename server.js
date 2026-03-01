@@ -16,7 +16,7 @@ app.use(cors({
 app.use(express.json());
 
 // Эти переменные берутся из окружения (Render или .env файл)
-const SUPABASE_URL = process.env.SUPABASE_URL || "https://njqhoiedauyyivbhvyla.supabase.co";
+const SUPABASE_URL = process.env.SUPABASE_URL || "https://vupnaqtsgycaqmdjabuq.supabase.co"; // Исправлено!
 const SUPABASE_SERVICE_KEY = process.env.SUPABASE_SERVICE_KEY;
 
 // Проверка, что ключ загружен
@@ -130,7 +130,36 @@ app.post('/api/auth/signup', async (req, res) => {
   res.json(data);
 });
 
-// 6. Получение профиля
+// ✅ 6. НОВЫЙ ЭНДПОИНТ ДЛЯ GOOGLE OAuth
+app.post('/api/auth/google', async (req, res) => {
+  const { redirectTo, lang } = req.body;
+  
+  try {
+    // Формируем URL для Google OAuth через Supabase
+    const { data, error } = await supabase.auth.signInWithOAuth({
+      provider: 'google',
+      options: {
+        redirectTo: redirectTo || 'https://shimmering-panda-4e619f.netlify.app',
+        queryParams: {
+          access_type: 'offline',
+          prompt: 'consent',
+        },
+      }
+    });
+
+    if (error) {
+      console.error('Google OAuth error:', error);
+      return res.status(400).json({ error: error.message });
+    }
+
+    res.json({ url: data.url });
+  } catch (error) {
+    console.error('Server error:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// 7. Получение профиля
 app.get('/api/profile/:userId', async (req, res) => {
   const { data, error } = await supabase
     .from('profiles')
@@ -142,7 +171,7 @@ app.get('/api/profile/:userId', async (req, res) => {
   res.json(data);
 });
 
-// 7. Обновление профиля
+// 8. Обновление профиля
 app.post('/api/profile', async (req, res) => {
   const { userId, first_name, last_name, phone } = req.body;
   
