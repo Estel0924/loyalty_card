@@ -184,5 +184,28 @@ app.post('/api/profile', async (req, res) => {
   res.json({ success: true });
 });
 
+// 9. Получение пользователя по access token (для OAuth)
+app.post('/api/auth/user', async (req, res) => {
+  const { access_token } = req.body;
+  
+  if (!access_token) {
+    return res.status(400).json({ error: 'No access token provided' });
+  }
+  
+  try {
+    // Получаем пользователя по токену
+    const { data, error } = await supabase.auth.getUser(access_token);
+    
+    if (error) {
+      return res.status(401).json({ error: error.message });
+    }
+    
+    res.json({ user: data.user });
+  } catch (error) {
+    console.error('Error getting user:', error);
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => console.log(`✅ Server running on port ${PORT}`));
